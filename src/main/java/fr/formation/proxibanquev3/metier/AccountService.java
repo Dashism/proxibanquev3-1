@@ -35,10 +35,16 @@ public class AccountService {
 		if (account.getCard() != null) {
 			// On vérifie que la date d'expiration est bien dépassée.
 			if (account.getCard().getEndDate().isBefore(LocalDate.now())) {
+				// Mémorisation de l'identifiant de la carte pour supprimer
+				// après avoir enlevé la relation avec le compte.
+				Integer cardId = account.getCard().getId();
 				// Retirer le lien entre l'ancienne carte et le compte.
 				account.setCard(null);
-				// Mettre à jour le compte pour que le lien n'existe plus en BDD.
-				this.accountDao.update(account);				
+				// Mettre à jour le compte pour que le lien n'existe plus en
+				// BDD.
+				this.accountDao.update(account);
+				// Suppression de la carte.
+				this.cardDao.delete(cardId);
 			} else {
 				// Sinon on indique qu'il ne faut pas créer de carte.
 				resultOk = false;
